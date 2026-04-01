@@ -1,25 +1,38 @@
-const form = document.querySelector("#form-idade");
+console.log("JS carregou");
 
-form.addEventListener("submit", function (event) {
+const form = document.querySelector("#form-idade");
+console.log("form encontrado", form);
+
+form.addEventListener("submit", async function (event) {
+    console.log("teste submit");
     event.preventDefault();
 
     const idadeInput = document.querySelector("#idade").value;
     const idade = Number(idadeInput);
 
-    if (idade === 0) {
-        console.log("Idade inválida");
+    if (!idade) {
         alert("Idade inválida");
+        return;
     }
 
-    else if (idade >= 18 && idade > 0) {
-        console.log("Maior de idade!");
-        alert("Maior de idade!");
-    }
+    try {
+        console.log("Teste antes fetch");
+        const resposta = await fetch("http://localhost:3000/validar-idade", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ idade })
+        });
 
-    else {
-        console.log("Menor de idade!");
-        alert("Erro: menor de idade");
-    }
+        console.log("Teste depois fetch");
 
-}
-);
+        const dados = await resposta.json();
+
+        alert(dados.mensagem);
+
+    } catch (erro) {
+        console.error("Erro ao conectar com o servidor", erro);
+        alert("Erro no servidor");
+    }
+});
